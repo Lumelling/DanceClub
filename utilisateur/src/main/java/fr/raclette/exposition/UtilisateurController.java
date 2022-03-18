@@ -2,10 +2,13 @@ package fr.raclette.exposition;
 
 import fr.raclette.entities.Utilisateur;
 import fr.raclette.repo.UtilisateurRepository;
+import fr.raclette.services.UtilisateurService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 /**
  * Service d'exposition REST des clients.
@@ -16,19 +19,19 @@ import org.springframework.web.bind.annotation.*;
 public class UtilisateurController {
     Logger logger = LoggerFactory.getLogger(UtilisateurController.class);
 
-    // Injection DAO clients
     @Autowired
-    private UtilisateurRepository repository;
+    private UtilisateurService service;
 
     /**
-     * GET 1 client
+     * GET un client
      * @param utilisateur id du client
      * @return Client converti en JSON
      */
     @GetMapping("{id}")
-    public Utilisateur getClient(@PathVariable("id") Utilisateur utilisateur) {
+    public Optional<Utilisateur> getClient(@PathVariable("id") Utilisateur utilisateur) {
         logger.info("Client : demande récup d'un client avec id:{}", utilisateur.getId());
-        return utilisateur;
+        return service.findUser(utilisateur.getId());
+
     }
 
     /**
@@ -38,7 +41,7 @@ public class UtilisateurController {
     @GetMapping("")
     public Iterable<Utilisateur> getClients() {
         logger.info("Utilisateur : demande récup des utilisateurs");
-        return repository.findAll();
+        return service.findAllUsers();
     }
 
     /**
@@ -49,6 +52,17 @@ public class UtilisateurController {
     @PostMapping("")
     public Utilisateur postClient(@RequestBody Utilisateur utilisateur) {
         logger.info("Client : demande CREATION d'un utilisateur avec id:{}", utilisateur.getId());
-        return repository.save(utilisateur);
+        return service.inscriptionUser(utilisateur);
+    }
+
+    /**
+     * POST un client
+     * @param utilisateur client à ajouter (import JSON)
+     * @return client ajouté
+     */
+    @DeleteMapping
+    public void deleteClient(@RequestBody Utilisateur utilisateur) {
+        logger.info("Client : demande SUPPRESSION d'un utilisateur avec id:{}", utilisateur.getId());
+        service.deleteUser(utilisateur);
     }
 }
