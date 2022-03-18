@@ -12,6 +12,7 @@
         <module>utilisateur</module>
         <module>annuaire</module>
         <module>configuration</module>
+        <module>creneau</module>
     </modules>
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
