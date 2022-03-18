@@ -28,7 +28,7 @@ public class UtilisateurController {
      * @return Client converti en JSON
      */
     @GetMapping("{id}")
-    public Optional<Utilisateur> getClient(@PathVariable("id") Utilisateur utilisateur) {
+    public Optional<Utilisateur> getUser(@PathVariable("id") Utilisateur utilisateur) {
         logger.info("Client : demande récup d'un client avec id:{}", utilisateur.getId());
         return service.findUser(utilisateur.getId());
 
@@ -50,7 +50,7 @@ public class UtilisateurController {
      * @return client ajouté
      */
     @PostMapping("")
-    public Utilisateur postClient(@RequestBody Utilisateur utilisateur) {
+    public Utilisateur postUser(@RequestBody Utilisateur utilisateur) {
         logger.info("Client : demande CREATION d'un utilisateur avec id:{}", utilisateur.getId());
         return service.inscriptionUser(utilisateur);
     }
@@ -61,8 +61,14 @@ public class UtilisateurController {
      * @return client ajouté
      */
     @DeleteMapping
-    public void deleteClient(@RequestBody Utilisateur utilisateur) {
+    public void deleteUser(@RequestBody Utilisateur utilisateur) {
         logger.info("Client : demande SUPPRESSION d'un utilisateur avec id:{}", utilisateur.getId());
         service.deleteUser(utilisateur);
+    }
+
+    @PutMapping
+    //si pas entre 1 et 5 return 401
+    public Utilisateur putExpertiseUser(@RequestBody Utilisateur utilisateur){
+
     }
 }
