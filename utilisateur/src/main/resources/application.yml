@@ -1,19 +1,8 @@
 spring:
   application:
     name: utilisateur
-  data:
-    mongodb:
-      database: odoru
-      username: root
-      password: admin
-      authentication-database: admin
-server:
-  port: 8080
-eureka:
-  instance:
-    hostname: localhost
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    serviceUrl:
-      defaultZone: http://localhost:8083/eureka/
+  profiles:
+    active: dev
+  # Adresse du service de configuration
+  config:
+    import: optional:configserver:http://localhost:8085
