@@ -54,6 +54,7 @@ public class UtilisateurServiceImpl implements UtilisateurService {
         Utilisateur user = utilisateurRepository.findById(id).get();
         /* modification du champ expertise de l'utilisateur */
         user.setExpertise(expertise);
+        /* ajout en base */
         return utilisateurRepository.save(user);
     }
 

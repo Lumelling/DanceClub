@@ -10,6 +10,5 @@ public interface UtilisateurService {
     void deleteUser(Utilisateur user);
     Iterable<Utilisateur> findAllUsers();
     Optional<Utilisateur> findUser(long id);
-    Utilisateur updateExpertise(String expertise);
-    public Utilisateur updateExpertise(int expertise, long id);
+    Utilisateur updateExpertise(int expertise, long id);
 }
