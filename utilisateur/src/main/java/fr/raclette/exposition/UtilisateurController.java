@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -25,14 +27,13 @@ public class UtilisateurController {
 
     /**
      * GET un client
-     * @param utilisateur id du client
+     * @param utilisateur : id du client à récupérer
      * @return Client converti en JSON
      */
     @GetMapping("{id}")
     public Optional<Utilisateur> getUser(@PathVariable("id") Utilisateur utilisateur) {
         logger.info("Client : demande récup d'un client avec id:{}", utilisateur.getId());
         return service.findUser(utilisateur.getId());
-
     }
 
     /**
@@ -47,26 +48,39 @@ public class UtilisateurController {
 
     /**
      * POST un client
-     * @param utilisateur client à ajouter (import JSON)
+     * @param utilisateur : client à ajouter (import JSON)
      * @return client ajouté
      */
     @PostMapping("")
-    public Utilisateur postUser(@RequestBody Utilisateur utilisateur) {
-        logger.info("Client : demande CREATION d'un utilisateur avec id:{}", utilisateur.getId());
-        return service.inscriptionUser(utilisateur);
+    //TODO : Vérifier que le rôle est bien IN(secrétaire, membre, enseignant, président [il n'y en à qu'une])
+    //TODO : vérifier que l'expertise est entre 0 et 5
+    public ResponseEntity<String> postUser(@RequestBody Utilisateur utilisateur) {
+        List<Utilisateur> usersCollection = new ArrayList<>();
+        service.findAllUsers().forEach(usersCollection::add);
+
+        //si le niveau d'expertise est pas entre 0 et 5
+        if (utilisateur.getExpertise() > 5 || utilisateur.getExpertise() < 0) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Le niveau d'expertise doit être compris entre 0 et 5 (CODE 401)\n");
+        //si le rôle est pas IN(secrétaire, membre, enseignant, président [il n'y en à qu'une])
+        } else if (utilisateur.getRole() != "secretaire" && utilisateur.getRole() != "membre" && utilisateur.getRole() != "enseignant" & utilisateur.getRole() != "president") {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Le niveau d'expertise doit être compris dans : (secrétaire, membre, enseignant, président [il n'y en à qu'une])\n");
+        //si il y a déjà un président et que on essaye d'en ajouter un nouveau
+        } else if (utilisateur.getRole() == "president" && !usersCollection.contains(utilisateur.getRole() == "president")){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Il ne peut y avoir qu'un.e seul.e président.e\n");
+        }else{
+            //création de l'utilisateur
+            logger.info("Client : demande CREATION d'un utilisateur avec id:{}", utilisateur.getId());
+            service.inscriptionUser(utilisateur);
+            return ResponseEntity.ok().body("L'utilisateur d'id {"+utilisateur.getId()+"} à bien été créé");
+        }
     }
 
     /**
-     * POST un client
-     * @param utilisateur client à ajouter (import JSON)
+     * PUT (Modifie) un utilisateur pour le rendre Expert
+     * @param utilisateur : client à ajouter
+     * @param expertise : niveau d'expertise
      * @return client ajouté
      */
-    @DeleteMapping
-    public void deleteUser(@RequestBody Utilisateur utilisateur) {
-        logger.info("Client : demande SUPPRESSION d'un utilisateur avec id:{}", utilisateur.getId());
-        service.deleteUser(utilisateur);
-    }
-
     @PutMapping
     //si pas entre 1 et 5 return 401
     public ResponseEntity<String> putExpertiseUser(@RequestBody Utilisateur utilisateur, int expertise){
@@ -78,5 +92,17 @@ public class UtilisateurController {
             service.updateExpertise(expertise,utilisateur.getId());
             return ResponseEntity.ok().body("Le niveau d'expertise de l'utilisateur d'id {"+utilisateur.getId()+"} est désormais : "+expertise);
         }
+    }
+
+    //TODO : Modifier un utilisateur dans son ensemble (Secrétaire)
+
+    /**
+     * DELETE un client
+     * @param utilisateur : client à supprimer
+     */
+    @DeleteMapping
+    public void deleteUser(@RequestBody Utilisateur utilisateur) {
+        logger.info("Client : demande SUPPRESSION d'un utilisateur avec id:{}", utilisateur.getId());
+        service.deleteUser(utilisateur);
     }
 }
