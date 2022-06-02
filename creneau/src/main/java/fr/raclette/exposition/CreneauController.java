@@ -1,5 +1,6 @@
 package fr.raclette.exposition;
 
+import fr.raclette.dto.Utilisateur;
 import fr.raclette.entities.Cours;
 import fr.raclette.repo.CreneauRepository;
 import org.slf4j.Logger;
@@ -20,16 +21,21 @@ public class CreneauController {
     @Autowired
     private CreneauRepository repository;
 
+    @Autowired
+    UtilisateurFeignController utilisateurFeignController;
+
     /**
      * GET 1 cours
      *
-     * @param id du cours
+     * @param cours id du cours
      * @return Cours converti en JSON
      */
     @GetMapping("{id}")
-    public Cours getCours(@PathVariable("id") Long id) {
+    public Cours getCours(@PathVariable("id") Cours cours) {
         logger.info("Cours : demande récup d'un cours avec id ");
-        return repository.findById(id).get();
+        Utilisateur prof = utilisateurFeignController.get(cours.getIdEnseignant());
+        logger.info("Prof du cours : {}", prof.toString());
+        return cours;
     }
 
     /**
