@@ -46,6 +46,16 @@ public class CreneauController {
     }
 
     /**
+     * DELETE un cours
+     */
+    @DeleteMapping("{id}")
+    public void deleteCours(@PathVariable("id") Long id) {
+        logger.info("Cours : demande de suppression d'un cours avec id ");
+
+        repository.deleteById(id);
+    }
+
+    /**
      * POST un cours
      * @param cours à ajouter (import JSON)
      * @return cours ajouté
@@ -54,7 +64,6 @@ public class CreneauController {
     public void postCours(@RequestBody Cours cours) {
 
         logger.info("Cours : demande CREATION d'un cours avec id:{}", cours.getId());
-
 
         repository.save(cours);
     }
