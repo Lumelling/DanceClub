@@ -19,7 +19,7 @@ public class CreneauController {
 
     private final static String MSG_ERR_NIVEAU_INCORRECT = "Erreur, le niveau de l'utilisateur est incorrect";
 
-    // Injection DAO clients
+    // Injection DAO creneau
     @Autowired
     private CreneauRepository repository;
 
@@ -29,12 +29,8 @@ public class CreneauController {
      * @return Cours converti en JSON
      */
     @GetMapping("{id}")
-    public Cours getCours(@PathVariable("id") Cours cours, @PathVariable("niveau") String niveauEtudiant) throws NiveauIncorrectException {
+    public Cours getCours(@PathVariable("id") Cours cours) {
         logger.info("Cours : demande récup d'un cours avec id:{}", cours.getId());
-
-        if (!cours.getNiveau().equals(niveauEtudiant)) {
-            throw new NiveauIncorrectException(MSG_ERR_NIVEAU_INCORRECT);
-        }
 
         return repository.findById(cours.getId()).get();
     }
@@ -52,23 +48,13 @@ public class CreneauController {
     /**
      * POST un cours
      * @param cours à ajouter (import JSON)
-     * @param niveauEnseignant niveau de l'enseignant
      * @return cours ajouté
      */
     @PostMapping("")
-    public void postCours(@RequestBody Cours cours, @RequestBody String niveauEnseignant) throws NiveauIncorrectException {
-
-        int dayInMiliseconds = 1000 * 60 * 60 * 24;
+    public void postCours(@RequestBody Cours cours) {
 
         logger.info("Cours : demande CREATION d'un cours avec id:{}", cours.getId());
 
-        if (!cours.getNiveau().equals(niveauEnseignant)
-                || cours.getCreneau().getDate().getTime()
-                < System.currentTimeMillis()
-                + (7 * dayInMiliseconds)) {
-
-            throw new NiveauIncorrectException(MSG_ERR_NIVEAU_INCORRECT);
-        }
 
         repository.save(cours);
     }
