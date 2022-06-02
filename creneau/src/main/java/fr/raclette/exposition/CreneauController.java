@@ -25,14 +25,14 @@ public class CreneauController {
 
     /**
      * GET 1 cours
-     * @param cours id du cours
+     * @param  id du cours
      * @return Cours converti en JSON
      */
     @GetMapping("{id}")
-    public Cours getCours(@PathVariable("id") Cours cours) {
-        logger.info("Cours : demande récup d'un cours avec id:{}", cours.getId());
+    public Cours getCours(@PathVariable("id") Long id) {
+        logger.info("Cours : demande récup d'un cours avec id ");
 
-        return repository.findById(cours.getId()).get();
+        return repository.findById(id).get();
     }
 
     /**
