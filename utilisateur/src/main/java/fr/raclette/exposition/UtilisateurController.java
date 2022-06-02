@@ -77,19 +77,18 @@ public class UtilisateurController {
     /**
      * PUT (Modifie) un utilisateur pour le rendre Expert
      * @param utilisateur : client à ajouter
-     * @param expertise : niveau d'expertise
      * @return client ajouté
      */
     @PutMapping
     //si pas entre 1 et 5 return 401
-    public ResponseEntity<String> putExpertiseUser(@RequestBody Utilisateur utilisateur, int expertise){
-        if (expertise>5 || expertise<0){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Le niveau d'expertise doit être compris entre 0 et 5 (CODE 401)\n");
+    public ResponseEntity<String> putExpertiseUser(@RequestBody Utilisateur utilisateur){
+        if (utilisateur.getExpertise()>5 || utilisateur.getExpertise()<0){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("[CODE 401] : Le niveau d'expertise doit être compris entre 0 et 5 \n");
         }else{
-            logger.info("Client : demande MODIFICATION du niveau d'expertise d'un utilisateur avec id:{}", utilisateur.getId()+" au niveau {] : "+expertise);
+            logger.info("Client : demande MODIFICATION du niveau d'expertise d'un utilisateur avec id:{}", utilisateur.getId()+" au niveau {] : "+utilisateur.getExpertise());
             //return service.updateExpertise(expertise,utilisateur.getId());
-            service.updateExpertise(expertise,utilisateur.getId());
-            return ResponseEntity.ok().body("Le niveau d'expertise de l'utilisateur d'id {"+utilisateur.getId()+"} est désormais : "+expertise);
+            service.updateExpertise(utilisateur.getExpertise(),utilisateur.getId());
+            return ResponseEntity.ok().body("Le niveau d'expertise de l'utilisateur d'id {"+utilisateur.getId()+"} est désormais : "+utilisateur.getExpertise());
         }
     }
 
