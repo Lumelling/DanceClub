@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.ws.rs.QueryParam;
+
 /**
  * Service d'exposition REST des clients.
  * URL / exposée.
@@ -43,6 +45,17 @@ public class CreneauController {
     public Iterable<Cours> getCours() {
         logger.info("Cours : demande récup des cours");
         return repository.findAll();
+    }
+
+    /**
+     * GET les cours du niveau X
+     * @param  niveau Niveau du cours
+     * @return Cours converti en JSON
+     */
+    @GetMapping("")
+    public Iterable<Cours> getCoursAvecNiveau(@RequestParam(name = "niveau") String niveau) {
+        logger.info("Cours : demande récup d'un cours avec niveau ");
+        return repository.findCoursByNiveau(niveau);
     }
 
     /**
