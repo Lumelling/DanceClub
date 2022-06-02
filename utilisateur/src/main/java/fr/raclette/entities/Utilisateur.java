@@ -30,6 +30,9 @@ public class Utilisateur {
     private String codePostal;
 
     @Field
+    private String email;
+
+    @Field
     private String rue;
 
     @Field
