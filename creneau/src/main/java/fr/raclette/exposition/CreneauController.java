@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.ws.rs.QueryParam;
+
 /**
  * Service d'exposition REST des clients.
  * URL / exposée.
@@ -19,24 +21,20 @@ public class CreneauController {
 
     private final static String MSG_ERR_NIVEAU_INCORRECT = "Erreur, le niveau de l'utilisateur est incorrect";
 
-    // Injection DAO clients
+    // Injection DAO creneau
     @Autowired
     private CreneauRepository repository;
 
     /**
      * GET 1 cours
-     * @param cours id du cours
+     * @param  id du cours
      * @return Cours converti en JSON
      */
     @GetMapping("{id}")
-    public Cours getCours(@PathVariable("id") Cours cours, @PathVariable("niveau") String niveauEtudiant) throws NiveauIncorrectException {
-        logger.info("Cours : demande récup d'un cours avec id:{}", cours.getId());
+    public Cours getCours(@PathVariable("id") Long id) {
+        logger.info("Cours : demande récup d'un cours avec id ");
 
-        if (!cours.getNiveau().equals(niveauEtudiant)) {
-            throw new NiveauIncorrectException(MSG_ERR_NIVEAU_INCORRECT);
-        }
-
-        return repository.findById(cours.getId()).get();
+        return repository.findById(id).get();
     }
 
     /**
@@ -50,25 +48,35 @@ public class CreneauController {
     }
 
     /**
+     * GET les cours du niveau X
+     * @param  niveau Niveau du cours
+     * @return Cours converti en JSON
+     */
+    @GetMapping("")
+    public Iterable<Cours> getCoursAvecNiveau(@RequestParam(name = "niveau") String niveau) {
+        logger.info("Cours : demande récup d'un cours avec niveau ");
+        return repository.findCoursByNiveau(niveau);
+    }
+
+    /**
+     * DELETE un cours
+     */
+    @DeleteMapping("{id}")
+    public void deleteCours(@PathVariable("id") Long id) {
+        logger.info("Cours : demande de suppression d'un cours avec id ");
+
+        repository.deleteById(id);
+    }
+
+    /**
      * POST un cours
      * @param cours à ajouter (import JSON)
-     * @param niveauEnseignant niveau de l'enseignant
      * @return cours ajouté
      */
     @PostMapping("")
-    public void postCours(@RequestBody Cours cours, @RequestBody String niveauEnseignant) throws NiveauIncorrectException {
-
-        int dayInMiliseconds = 1000 * 60 * 60 * 24;
+    public void postCours(@RequestBody Cours cours) {
 
         logger.info("Cours : demande CREATION d'un cours avec id:{}", cours.getId());
-
-        if (!cours.getNiveau().equals(niveauEnseignant)
-                || cours.getCreneau().getDate().getTime()
-                < System.currentTimeMillis()
-                + (7 * dayInMiliseconds)) {
-
-            throw new NiveauIncorrectException(MSG_ERR_NIVEAU_INCORRECT);
-        }
 
         repository.save(cours);
     }

@@ -11,4 +11,5 @@ import org.springframework.stereotype.Component;
 @Component
 public interface CreneauRepository extends MongoRepository<Cours,Long> {
 
+    Iterable<Cours> findCoursByNiveau(String niveau);
 }

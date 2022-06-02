@@ -22,7 +22,7 @@ public class Cours {
     private Creneau creneau;
 
     @Field
-    private Long idEnsegnant;
+    private Long idEnseignant;
 
     @Field
     private String lieu;

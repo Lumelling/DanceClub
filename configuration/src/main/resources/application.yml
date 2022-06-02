@@ -18,5 +18,5 @@ spring:
           uri: https://github.com/OdoruMIAGE/config.git
           clone-on-start: true
           username: lumelling
-          password: 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
+          password: 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
           default-label: master
