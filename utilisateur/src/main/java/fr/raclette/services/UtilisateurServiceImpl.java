@@ -25,8 +25,8 @@ public class UtilisateurServiceImpl implements UtilisateurService {
     /**
      * suppression d'un utilisateur
      */
-    public void deleteUser(Utilisateur user) {
-        utilisateurRepository.delete(user);
+    public void deleteUser(long id) {
+        utilisateurRepository.delete(findUser(id).get());
     }
 
     @Override
@@ -57,6 +57,9 @@ public class UtilisateurServiceImpl implements UtilisateurService {
         /* ajout en base */
         return utilisateurRepository.save(user);
     }
+
+    @Override
+    public Boolean RoleExist(String role) { return utilisateurRepository.existsUtilisateurByRole(role);}
 
 
 }

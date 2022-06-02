@@ -52,24 +52,23 @@ public class UtilisateurController {
      * @return client ajouté
      */
     @PostMapping("")
-    //TODO : Vérifier que le rôle est bien IN(secrétaire, membre, enseignant, président [il n'y en à qu'une])
-    //TODO : vérifier que l'expertise est entre 0 et 5
     public ResponseEntity<String> postUser(@RequestBody Utilisateur utilisateur) {
         List<Utilisateur> usersCollection = new ArrayList<>();
         service.findAllUsers().forEach(usersCollection::add);
-
+        logger.info("Client : demande CREATION d'un utilisateur avec rôle : {}", utilisateur.getRole());
+        logger.info("Contains : {}",usersCollection.contains(utilisateur.getRole().equals("president")));
         //si le niveau d'expertise est pas entre 0 et 5
         if (utilisateur.getExpertise() > 5 || utilisateur.getExpertise() < 0) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Le niveau d'expertise doit être compris entre 0 et 5 (CODE 401)\n");
-        //si le rôle est pas IN(secrétaire, membre, enseignant, président [il n'y en à qu'une])
-        } else if (utilisateur.getRole() != "secretaire" && utilisateur.getRole() != "membre" && utilisateur.getRole() != "enseignant" & utilisateur.getRole() != "president") {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Le niveau d'expertise doit être compris dans : (secrétaire, membre, enseignant, président [il n'y en à qu'une])\n");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("[CODE 401] : Le niveau d'expertise doit être compris entre 0 et 5\n");
+        //si le rôle est pas IN(secrétaire, membre, enseignant, président)
+        } else if (!utilisateur.getRole().equals("secretaire") && !utilisateur.getRole().equals("membre") && !utilisateur.getRole().equals("enseignant") && !utilisateur.getRole().equals("president")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("[CODE 401] : Le rôle doit être compris dans : (secretaire, membre, enseignant, president)\n");
         //si il y a déjà un président et que on essaye d'en ajouter un nouveau
-        } else if (utilisateur.getRole() == "president" && !usersCollection.contains(utilisateur.getRole() == "president")){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Il ne peut y avoir qu'un.e seul.e président.e\n");
+        } else if (utilisateur.getRole().equals("president") && service.RoleExist("president")){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("[CODE 401] : Il ne peut y avoir qu'un.e seul.e président.e\n");
         }else{
             //création de l'utilisateur
-            logger.info("Client : demande CREATION d'un utilisateur avec id:{}", utilisateur.getId());
+            logger.info("Client : demande CREATION d'un utilisateur avec id : {}", utilisateur.getId());
             service.inscriptionUser(utilisateur);
             return ResponseEntity.ok().body("L'utilisateur d'id {"+utilisateur.getId()+"} à bien été créé");
         }
@@ -98,11 +97,13 @@ public class UtilisateurController {
 
     /**
      * DELETE un client
-     * @param utilisateur : client à supprimer
+     * @param id : client à supprimer
+     * @return
      */
-    @DeleteMapping
-    public void deleteUser(@RequestBody Utilisateur utilisateur) {
-        logger.info("Client : demande SUPPRESSION d'un utilisateur avec id:{}", utilisateur.getId());
-        service.deleteUser(utilisateur);
+    @DeleteMapping("{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable("id") long id) {
+        logger.info("Client : demande SUPPRESSION d'un utilisateur avec id:{}", id);
+        service.deleteUser(id);
+        return ResponseEntity.ok().body("l'utilisateur d'id {"+id+"} à été supprimé");
     }
 }
