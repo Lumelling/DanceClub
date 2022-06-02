@@ -80,15 +80,21 @@ public class UtilisateurController {
      * @return client ajouté
      */
     @PutMapping
-    //si pas entre 1 et 5 return 401
     public ResponseEntity<String> putExpertiseUser(@RequestBody Utilisateur utilisateur){
-        if (utilisateur.getExpertise()>5 || utilisateur.getExpertise()<0){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("[CODE 401] : Le niveau d'expertise doit être compris entre 0 et 5 \n");
+        //si pas entre 1 et 5 return 401
+        if (utilisateur.getExpertise() > 5 || utilisateur.getExpertise() < 0) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("[CODE 401] : Le niveau d'expertise doit être compris entre 0 et 5\n");
+            //si le rôle est pas IN(secrétaire, membre, enseignant, président)
+        } else if (!utilisateur.getRole().equals("secretaire") && !utilisateur.getRole().equals("membre") && !utilisateur.getRole().equals("enseignant") && !utilisateur.getRole().equals("president")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("[CODE 401] : Le rôle doit être compris dans : (secretaire, membre, enseignant, president)\n");
+            //si il y a déjà un président et que on essaye d'en ajouter un nouveau
+        } else if (utilisateur.getRole().equals("president") && service.RoleExist("president")){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("[CODE 401] : Il ne peut y avoir qu'un.e seul.e président.e\n");
         }else{
-            logger.info("Client : demande MODIFICATION du niveau d'expertise d'un utilisateur avec id:{}", utilisateur.getId()+" au niveau {] : "+utilisateur.getExpertise());
-            //return service.updateExpertise(expertise,utilisateur.getId());
-            service.updateExpertise(utilisateur.getExpertise(),utilisateur.getId());
-            return ResponseEntity.ok().body("Le niveau d'expertise de l'utilisateur d'id {"+utilisateur.getId()+"} est désormais : "+utilisateur.getExpertise());
+            //création de l'utilisateur
+            logger.info("Client : demande CREATION d'un utilisateur avec id : {}", utilisateur.getId());
+            service.updateUser(utilisateur);
+            return ResponseEntity.ok().body("L'utilisateur d'id {"+utilisateur.getId()+"} à bien été modifié");
         }
     }
 

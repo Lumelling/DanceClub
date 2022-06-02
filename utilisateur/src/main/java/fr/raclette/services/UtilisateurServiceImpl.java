@@ -49,13 +49,9 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 
     @Override
     //TODO : vérifier que c'est bien la secrétaire qui modifie
-    public Utilisateur updateExpertise(int expertise, long id) {
-        /* récupération de l'utilisateur */
-        Utilisateur user = utilisateurRepository.findById(id).get();
-        /* modification du champ expertise de l'utilisateur */
-        user.setExpertise(expertise);
+    public Utilisateur updateUser(Utilisateur newUser) {
         /* ajout en base */
-        return utilisateurRepository.save(user);
+        return utilisateurRepository.save(newUser);
     }
 
     @Override

@@ -10,6 +10,6 @@ public interface UtilisateurService {
     void deleteUser(long user);
     Iterable<Utilisateur> findAllUsers();
     Optional<Utilisateur> findUser(long id);
-    Utilisateur updateExpertise(int expertise, long id);
+    Utilisateur updateUser(Utilisateur id);
     Boolean RoleExist(String role);
 }
