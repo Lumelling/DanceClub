@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.Date;
 
-
+@Data
 public class Creneau {
     @Id
     private Long id;
