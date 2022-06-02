@@ -57,6 +57,19 @@ public class CreneauController {
     }
 
     /**
+     * GET les cours dispensé par un enseignant
+     *
+     * @param idEnseignant id de l'enseignant
+     * @return Cours converti en JSON
+     */
+    @GetMapping(value = "", params="idEnseignant")
+    public Iterable<Cours> getCoursAvecNiveau(@RequestParam(name = "idEnseignant") Long idEnseignant) {
+        logger.info("Cours : demande récup d'un cours avec niveau ");
+        return repository.findCoursByIdEnseignant(idEnseignant);
+
+    }
+
+    /**
      * DELETE un cours
      */
     @DeleteMapping("{id}")
