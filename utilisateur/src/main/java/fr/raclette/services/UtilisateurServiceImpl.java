@@ -48,10 +48,14 @@ public class UtilisateurServiceImpl implements UtilisateurService {
     }
 
     @Override
-    //TODO : vérifier que c'est bien la secrétaire qui modifie
-    public Utilisateur updateUser(Utilisateur newUser) {
-        /* ajout en base */
-        return utilisateurRepository.save(newUser);
+    public Utilisateur updateUser(Utilisateur newUser, long idModif) throws Exception {
+        if(findUser(idModif).get().getRole().equals("secretaire")){
+            /* ajout en base */
+            return utilisateurRepository.save(newUser);
+        }else{
+            throw new Exception("Vous devez être secrétaire pour modifier cet utilisateur");
+        }
+
     }
 
     @Override

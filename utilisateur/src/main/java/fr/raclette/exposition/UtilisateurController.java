@@ -79,8 +79,8 @@ public class UtilisateurController {
      * @param utilisateur : client à ajouter
      * @return client ajouté
      */
-    @PutMapping
-    public ResponseEntity<String> putExpertiseUser(@RequestBody Utilisateur utilisateur){
+    @PutMapping("{idModificateur}")
+    public ResponseEntity<String> putExpertiseUser(@RequestBody Utilisateur utilisateur, @PathVariable("idModificateur") long idModificateur) throws Exception {
         //si pas entre 1 et 5 return 401
         if (utilisateur.getExpertise() > 5 || utilisateur.getExpertise() < 0) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("[CODE 401] : Le niveau d'expertise doit être compris entre 0 et 5\n");
@@ -93,12 +93,14 @@ public class UtilisateurController {
         }else{
             //création de l'utilisateur
             logger.info("Client : demande CREATION d'un utilisateur avec id : {}", utilisateur.getId());
-            service.updateUser(utilisateur);
-            return ResponseEntity.ok().body("L'utilisateur d'id {"+utilisateur.getId()+"} à bien été modifié");
+            try{
+                service.updateUser(utilisateur,idModificateur);
+                return ResponseEntity.ok().body("L'utilisateur d'id {"+utilisateur.getId()+"} à bien été modifié");
+            }catch (Exception e){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("[CODE 401] : Vous devez être secrétaire pour modifier un utilisateur \n");
+            }
         }
     }
-
-    //TODO : Modifier un utilisateur dans son ensemble (Secrétaire)
 
     /**
      * DELETE un client
