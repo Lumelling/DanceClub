@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: gateway
+  profiles:
+    active: dev
+  # Adresse du service de configuration
+  config:
+    import: optional:configserver:http://localhost:8085
