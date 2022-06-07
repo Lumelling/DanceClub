@@ -11,5 +11,5 @@ import java.util.List;
  */
 @Component
 public interface UtilisateurRepository extends MongoRepository<Utilisateur,Long> {
-
+    public Boolean existsUtilisateurByRole(String role);
 }
