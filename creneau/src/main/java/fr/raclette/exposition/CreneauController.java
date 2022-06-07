@@ -35,10 +35,10 @@ public class CreneauController {
      * @return Cours converti en JSON
      */
     @GetMapping("{id}")
-    public ResponseEntity<?> getCours(@PathVariable("id") Cours cours) {
+    public Cours getCours(@PathVariable("id") Cours cours) {
         logger.info("Cours : demande récup d'un cours avec id ");
 
-        return ResponseEntity.status(HttpStatus.OK).body(cours);
+        return cours;
     }
 
     /**
