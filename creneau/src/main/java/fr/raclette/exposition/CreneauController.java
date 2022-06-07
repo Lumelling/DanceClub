@@ -10,6 +10,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Service d'exposition REST des clients.
  * URL / exposée.
@@ -18,10 +22,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/")
 public class CreneauController {
 
+    private final static String MSG_ERR_ROLE_INCORRECT = "Erreur, l'utilisateur n'est pas autorisé";
     private final static String MSG_ERR_ENSEIGNANT_INCORRECT = "Erreur, l'enseignant n'existe pas";
     private final static String MSG_ERR_NIVEAU_INCORRECT = "Erreur, le niveau du cours est incorrect";
+    private final static String MSG_ERR_DATE_INCORRECTE = "Erreur, la date du cours est incorrecte";
     private final static String MSG_ERR_NIVEAU_ENSEIGNANT_INCORRECT = "Erreur, le niveau de l'enseignant est incorrect";
+    private final static String MSG_COURS_AJOUTE = "Le cours a bien été ajouté";
 
+    private final static Long JOUR_EN_MILLISECONDES = 1440000L;
 
     Logger logger = LoggerFactory.getLogger(CreneauController.class);
 
@@ -107,13 +115,25 @@ public class CreneauController {
     public ResponseEntity<String> postCours(@RequestBody Cours cours) {
 
         logger.info("Cours : demande CREATION d'un cours avec id:{}", cours.getId());
+
+        Utilisateur prof;
+
         try {
-            Utilisateur prof =  utilisateurFeignController.get(cours.getIdEnseignant());
+            prof =  utilisateurFeignController.get(cours.getIdEnseignant());
 
             if (prof.getExpertise() < cours.getNiveau()) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("[CODE 401] : " + MSG_ERR_NIVEAU_ENSEIGNANT_INCORRECT);
             }
 
+            Date dateCours = new SimpleDateFormat("dd/MM/yyyy").parse(cours.getCreneau().getDate());
+            Date dateDuJour = new Date();
+
+            if (dateCours.getTime() < (dateDuJour.getTime() + (JOUR_EN_MILLISECONDES * 7))) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("[CODE 401] : " + MSG_ERR_DATE_INCORRECTE);
+            }
+
+        } catch (ParseException parseException) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("[CODE 401] : " + MSG_ERR_DATE_INCORRECTE);
         } catch(Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("[CODE 401] : " + MSG_ERR_ENSEIGNANT_INCORRECT);
         }
@@ -122,7 +142,11 @@ public class CreneauController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("[CODE 401] : " + MSG_ERR_NIVEAU_INCORRECT);
         }
 
-        //repository.save(cours);
-        return ResponseEntity.status(HttpStatus.OK).body("Success");
+        if (!prof.getRole().equals("enseignant")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("[CODE 401] : " + MSG_ERR_ROLE_INCORRECT);
+        }
+
+        repository.save(cours);
+        return ResponseEntity.status(HttpStatus.OK).body("[CODE 200] : " + MSG_COURS_AJOUTE);
     }
 }
