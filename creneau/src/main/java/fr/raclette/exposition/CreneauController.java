@@ -2,7 +2,6 @@ package fr.raclette.exposition;
 
 import fr.raclette.dto.Utilisateur;
 import fr.raclette.entities.Cours;
-import fr.raclette.exceptions.NiveauIncorrectException;
 import fr.raclette.repo.CreneauRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +17,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/")
 public class CreneauController {
-    private final static String MSG_ERR_NIVEAU_INCORRECT = "Erreur, le niveau de l'utilisateur est incorrect";
+
+    private final static String MSG_ERR_ENSEIGNANT_INCORRECT = "Erreur, l'enseignant n'existe pas";
+    private final static String MSG_ERR_NIVEAU_INCORRECT = "Erreur, le niveau du cours est incorrect";
+    private final static String MSG_ERR_NIVEAU_ENSEIGNANT_INCORRECT = "Erreur, le niveau de l'enseignant est incorrect";
+
+
     Logger logger = LoggerFactory.getLogger(CreneauController.class);
 
     // Injection DAO creneau
@@ -27,6 +31,9 @@ public class CreneauController {
 
     @Autowired
     UtilisateurFeignController utilisateurFeignController;
+
+    private final int NIVEAU_MINIMUM = 1;
+    private final int NIVEAU_MAXIMUM = 5;
 
     /**
      * GET 1 cours
@@ -101,8 +108,17 @@ public class CreneauController {
 
         logger.info("Cours : demande CREATION d'un cours avec id:{}", cours.getId());
         try {
-            Utilisateur prof = utilisateurFeignController.get(cours.getIdEnseignant());
+            Utilisateur prof =  utilisateurFeignController.get(cours.getIdEnseignant());
+
+            if (prof.getExpertise() < cours.getNiveau()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("[CODE 401] : " + MSG_ERR_NIVEAU_ENSEIGNANT_INCORRECT);
+            }
+
         } catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("[CODE 401] : " + MSG_ERR_ENSEIGNANT_INCORRECT);
+        }
+
+        if (cours.getNiveau() < NIVEAU_MINIMUM || cours.getNiveau() > NIVEAU_MAXIMUM) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("[CODE 401] : " + MSG_ERR_NIVEAU_INCORRECT);
         }
 
