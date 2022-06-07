@@ -97,9 +97,16 @@ public class CreneauController {
      * @return cours ajouté
      */
     @PostMapping("")
-    public Cours postCours(@RequestBody Cours cours) {
+    public ResponseEntity<String> postCours(@RequestBody Cours cours) {
 
         logger.info("Cours : demande CREATION d'un cours avec id:{}", cours.getId());
-        return repository.save(cours);
+        try {
+            Utilisateur prof = utilisateurFeignController.get(cours.getIdEnseignant());
+        } catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("[CODE 401] : " + MSG_ERR_NIVEAU_INCORRECT);
+        }
+
+        //repository.save(cours);
+        return ResponseEntity.status(HttpStatus.OK).body("Success");
     }
 }
