@@ -2,10 +2,13 @@ package fr.raclette.exposition;
 
 import fr.raclette.dto.Utilisateur;
 import fr.raclette.entities.Cours;
+import fr.raclette.exceptions.NiveauIncorrectException;
 import fr.raclette.repo.CreneauRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class CreneauController {
     private final static String MSG_ERR_NIVEAU_INCORRECT = "Erreur, le niveau de l'utilisateur est incorrect";
     Logger logger = LoggerFactory.getLogger(CreneauController.class);
+
     // Injection DAO creneau
     @Autowired
     private CreneauRepository repository;
@@ -31,11 +35,10 @@ public class CreneauController {
      * @return Cours converti en JSON
      */
     @GetMapping("{id}")
-    public Cours getCours(@PathVariable("id") Cours cours) {
+    public ResponseEntity<?> getCours(@PathVariable("id") Cours cours) {
         logger.info("Cours : demande récup d'un cours avec id ");
-        Utilisateur prof = utilisateurFeignController.get(cours.getIdEnseignant());
-        logger.info("Prof du cours : {}", prof.toString());
-        return cours;
+
+        return ResponseEntity.status(HttpStatus.OK).body(cours);
     }
 
     /**
@@ -55,11 +58,12 @@ public class CreneauController {
      * @param niveau Niveau du cours
      * @return Cours converti en JSON
      */
-    @GetMapping(value = "", params="niveau")
-    public Iterable<Cours> getCoursAvecNiveau(@RequestParam(name = "niveau") String niveau) {
-        logger.info("Cours : demande récup d'un cours avec niveau ");
-        return repository.findCoursByNiveau(niveau);
+    @GetMapping(value = "", params={"niveau"})
+    public Iterable<Cours> getCoursAvecNiveau(
+            @RequestParam(name = "niveau") int niveau) {
+        logger.info("Cours : demande récup d'un cours avec niveau : {}");
 
+        return repository.findCoursByNiveau(niveau);
     }
 
     /**
@@ -69,8 +73,9 @@ public class CreneauController {
      * @return Cours converti en JSON
      */
     @GetMapping(value = "", params="idEnseignant")
-    public Iterable<Cours> getCoursAvecNiveau(@RequestParam(name = "idEnseignant") Long idEnseignant) {
+    public Iterable<Cours> getCoursAvecIdEnseignant(@RequestParam(name = "idEnseignant") Long idEnseignant) {
         logger.info("Cours : demande récup d'un cours avec niveau ");
+
         return repository.findCoursByIdEnseignant(idEnseignant);
 
     }

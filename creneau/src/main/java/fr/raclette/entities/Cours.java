@@ -16,7 +16,7 @@ public class Cours {
     private String titre;
 
     @Field
-    private String niveau;
+    private int niveau;
 
     @Field
     private Creneau creneau;
